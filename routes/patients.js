@@ -1,9 +1,11 @@
 const errors = require('restify-errors');
 const Patient = require('../models/Patient');
+const rjwt = require('restify-jwt-community');
+const config = require('../config');
 
 module.exports = server => {
     //Get Patients
-    server.get('/patients', async (req, res, next) => {
+    server.get('/patients',rjwt({ secret: config.JWT_SECRET}), async (req, res, next) => {
         
         try{
             const patients = await Patient.find({});
@@ -15,7 +17,7 @@ module.exports = server => {
     });
 
     // Add Patients
-    server.post('/patients', async (req, res, next) => {
+    server.post('/patients', rjwt({ secret: config.JWT_SECRET}), async (req, res, next) => {
         //Check for JSON
         if(!req.is('application/json')){
             return next(new errors.InvalidContentError("Expects 'application/json'"));
@@ -39,7 +41,7 @@ module.exports = server => {
         }
     });
     //Get Single Patients
-    server.get('/patients/:id', async (req, res, next) => {
+    server.get('/patients/:id',rjwt({ secret: config.JWT_SECRET}), async (req, res, next) => {
         
         try{
             const patient = await Patient.findById(req.params.id);
@@ -51,7 +53,7 @@ module.exports = server => {
     });
     
     //Update Patient
-    server.put('/patients/:id', async (req, res, next) => {
+    server.put('/patients/:id',rjwt({ secret: config.JWT_SECRET}), async (req, res, next) => {
         //Check for JSON
         if(!req.is('application/json')){
             return next(new errors.InvalidContentError("Expects 'application/json'"));
@@ -65,7 +67,7 @@ module.exports = server => {
         }
     });
     //Delete Patient
-    server.del('/patients/:id', async (req, res, next) => {
+    server.del('/patients/:id',rjwt({ secret: config.JWT_SECRET}), async (req, res, next) => {
         try {
             const patient = await Patient.findByIdAndRemove({_id: req.params.id});
         } catch (err){
